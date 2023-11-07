@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+struct Aluno {
+    char nome[50];
+    char curso[37];
+    struct Aluno* proximo;
+};
+
+struct Aluno* adicionarAluno(struct Aluno* ponteiro, const char* nome, const char* curso) {
+    struct Aluno* novoAluno = (struct Aluno*)malloc(sizeof(struct Aluno));
+    
+    if (novoAluno == NULL) {
+        printf("Erro ao alocar memória para o aluno.\n");
+        return ponteiro;
+    }
+    
+    strncpy(novoAluno->nome, nome, sizeof(novoAluno->nome));
+    strncpy(novoAluno->curso, curso, sizeof(novoAluno->curso));
+    novoAluno->proximo = ponteiro;
+    return novoAluno;
+}
+
+struct Aluno* obterAluno(struct Aluno* ponteiro, int indice) {
+    struct Aluno* atual = ponteiro;
+    int contador = 0;
+    
+    while (atual != NULL) {
+        if (contador == indice) {
+            return atual;
+        }
+        contador++;
+        atual = atual->proximo;
+    }
+    
+    return NULL;
+}
+
+void liberarListaDeAlunos(struct Aluno* ponteiro) {
+    struct Aluno* atual = ponteiro;
+    while (atual != NULL) {
+        struct Aluno* temp = atual;
+        atual = atual->proximo;
+        free(temp);
+    }
+}
+
+int main() {
+    struct Aluno* listaDeAlunos = NULL;
+    int escolha;
+    
+    do {
+        printf("Escolha uma opção:\n");
+        printf("1. Adicionar aluno\n");
+        printf("2. Recuperar aluno\n");
+        printf("3. Sair\n");
+        scanf("%d", &escolha);
+        
+        switch (escolha) {
+            case 1: {
+                char nome[100];
+                char curso[100];
+                printf("insira o nome do aluno: ");
+                scanf("%s", nome);
+                printf("insira o curso do aluno: ");
+                scanf("%s", curso);
+                listaDeAlunos = adicionarAluno(listaDeAlunos, nome, curso);
+                break;
+            }
+            case 2: {
+                int indice;
+                printf("insira o índice do aluno para recuperadar: ");
+                scanf("%d", &indice);
+                struct Aluno* aluno = obterAluno(listaDeAlunos, indice);
+                if (aluno != NULL) {
+                    printf("Nome: %s, Curso: %s\n", aluno->nome, aluno->curso);
+                } else {
+                    printf("Aluno não encontrado.\n");
+                }
+                break;
+            }
+            case 3: {
+                liberarListaDeAlunos(listaDeAlunos);
+                printf("Programa encerrado.\n");
+                return 0;
+            }
+            default:
+                printf("Opção inválida.\n");
+        }
+    } while (1);
+
+    return 0;
+}
